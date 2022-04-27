@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "CommonJS",
+    "moduleResolution": "node", //模块解析方式
+    "removeComments": true, // 删除注释
+    "esModuleInterop": true, //允许通过es6语法引入commonjs模块
+    "resolveJsonModule": true, //解析json模块--不设置某些块会引入会报错
+    "allowJs": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts"]
+}
