@@ -1,6 +1,6 @@
 {
   "name": "@yaoxfly/deploy",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "自动化部署",
   "main": "bin",
   "private": false,
@@ -17,19 +17,16 @@
   "publishConfig": {
     "access": "public"
   },
-
   "keywords": [
     "自动化部署",
     "auto-deploy",
     "upload file",
     "上传"
   ],
-  
   "repository": {
     "type": "git",
     "url": "https://github.com/yaoxfly/yaoxfly-deploy.git"
   },
-
   "author": "yaoxfly",
   "license": "MIT",
   "dependencies": {
