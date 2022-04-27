@@ -8,5 +8,5 @@
     "resolveJsonModule": true, //解析json模块--不设置某些块会引入会报错
     "allowJs": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"]
+  "include": ["bin/**/*.ts", "bin/**/*.d.ts"]
 }
