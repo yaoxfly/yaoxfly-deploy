@@ -19,7 +19,7 @@ npm i  @yaoxfly/deploy -g
 npm i  ts-node -g
 ```
 
-# 配置
+# 配置 
 在根路径添加配置文件`yx.deploy.config`
 
 ```js
@@ -47,10 +47,21 @@ module.exports = {
 }
 ```
 
-# 运行 
+> 一定要配置当前文件
+
+
+# 执行 
 
 ```js
  yx-deploy upload
+ 
+```
+
+或者可以在 package.json scripts配置 `"deploy": "./node_modules/.bin/yx-deploy upload"` 然后执行
+
+```
+ npm  run  deploy
+
 ```
 
 >  服务器需要安装`unzip`,否则解压不成功
