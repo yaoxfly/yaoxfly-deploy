@@ -1,6 +1,6 @@
 {
   "name": "@yaoxfly/deploy",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "自动化部署",
   "main": "bin",
   "private": false,
@@ -36,10 +36,10 @@
     "compressing": "1.5.1",
     "ora": "5.1.0",
     "ssh2": "1.9.0",
-    "@types/node": "17.0.25"
+    "@types/node": "17.0.25",
+    "typescript": "4.6.3"
   },
   "devDependencies": {
-    "ts-node": "10.7.0",
-    "typescript": "4.6.3"
+    "ts-node": "10.7.0"
   }
 }
