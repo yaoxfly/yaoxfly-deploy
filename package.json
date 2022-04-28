@@ -1,6 +1,6 @@
 {
   "name": "@yaoxfly/deploy",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "自动化部署",
   "main": "bin",
   "private": false,
