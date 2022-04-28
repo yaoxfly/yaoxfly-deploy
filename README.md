@@ -4,18 +4,16 @@
 
 # 安装
 
-全局下载
-
-```
+```js
 npm i  @yaoxfly/deploy -g
 
 // 执行 yx-deploy -V 看版本号，测试是否安装成功
 
 ```
 
-需要`ts-node`支持，全局下载
+需要`ts-node`支持，全局下载 
 
-```
+```js
 npm i  ts-node -g
 ```
 
@@ -49,19 +47,18 @@ module.exports = {
 
 > 一定要配置当前文件
 
-
 # 执行 
 
 ```js
- yx-deploy upload
- 
+ yx-deploy upload 
+ or
+ yx-deploy u //缩写
 ```
 
 或者可以在 package.json scripts配置 `"deploy": "./node_modules/.bin/yx-deploy upload"` 然后执行
 
-```
+```js
  npm  run  deploy
-
 ```
 
 >  服务器需要安装`unzip`,否则解压不成功
