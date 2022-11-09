@@ -1,18 +1,21 @@
 {
   "name": "@yaoxfly/deploy",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "自动化部署",
   "main": "bin",
   "private": false,
   "scripts": {
-    "deploy": "ts-node ./src/deploy.ts",
-    "lib": "rollup -c build/rollup.config.js",
+    "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "node ./bin/version.js",
     "publish": "npm version patch -f"
   },
+  "files": [
+    "bin",
+    "version.json"
+  ],
   "bin": {
-    "yx-deploy": "./bin/yx-deploy.ts",
-    "yx-deploy-upload": "./bin/yx-deploy-upload.ts"
+    "yx-deploy": "./bin/index.js"
   },
   "publishConfig": {
     "access": "public"
@@ -30,16 +33,14 @@
   "author": "yaoxfly",
   "license": "MIT",
   "dependencies": {
+    "@types/node": "17.0.25",
     "chalk": "4.1.0",
     "child_process": "1.0.2",
-    "commander": "^9.2.0",
+    "commander": "9.2.0",
     "compressing": "1.5.1",
+    "log-symbols": "4.0.0",
     "ora": "5.1.0",
     "ssh2": "1.9.0",
-    "@types/node": "17.0.25",
     "typescript": "4.6.3"
-  },
-  "devDependencies": {
-    "ts-node": "10.7.0"
   }
 }
