@@ -7,42 +7,6 @@ import compressing from 'compressing'
 import ora from 'ora' //这个ora包不能下最新的会报错
 import chalk from 'chalk' //这个chalk包不能下最新的会报错
 const configPath = path.resolve(process.cwd(), './yx.deploy.config')
-interface Config {
-  connect: {
-    host: string
-    port: string
-    username: string
-    password: string
-  }
-  upload: {
-    name: string,
-    path: string,
-    remotePath: string
-  }
-  build: {
-    command: string
-  }
-}
-
-let config: Config = {
-  connect: {
-    host: "",
-    port: "",
-    username: "",
-    password: ""
-  },
-  upload: {
-    name: "",
-    path: "",
-    remotePath: ""
-  },
-
-  build: {
-    command: ""
-  }
-};
-
-
 const log = (text, type = 'success',) => {
   const keyMap = {
     'success': chalk.green(text),
@@ -51,27 +15,14 @@ const log = (text, type = 'success',) => {
   console.log('\n', keyMap[type])
 }
 
+export async function upload() {
+  try { 
+    fs.accessSync(configPath, fs.constants.F_OK); 
+  } catch (err) { 
+    throw new Error('The yx.deploy.config file does not exist!')
+  } 
 
-const isFileExisted = (path) => {
-  return new Promise((resolve, reject) => {
-    fs.access(path, (err) => {
-      if (err) {
-        reject(false);
-      } else {
-        resolve(true);
-      }
-    })
-  })
-}
-
-
-async function deploy() {
-  const exists = await isFileExisted(configPath)
-  if (!exists) {
-    throw new Error('deploy.js文件不可为空')
-  }
-  config = require(configPath)
-
+  let config = require(configPath)
   config.build?.command && await new Promise((resolve, reject) => {
     const spinner = ora('正在打包').start();
     child_process.exec(`${config.build.command}`, {
@@ -86,8 +37,6 @@ async function deploy() {
     })
   })
 
-
-
   await new Promise((resolve, reject) => {
     const dir = path.resolve(process.cwd(), config.upload.path)
     const dest = path.resolve(process.cwd(), `${config.upload.name}.zip`)
@@ -101,7 +50,6 @@ async function deploy() {
       reject(err)
     })
   })
-
 
   const connect = new Client()
   setTimeout(() => {
@@ -120,7 +68,6 @@ async function deploy() {
           reject(err)
           return
         }
-
         const file = path.resolve(process.cwd(), `${config.upload.name}.zip`) // 要上传的文件
         const dest = `${config.upload.remotePath}${config.upload.name}.zip` //  linux下存放目录和压缩后的名称。
         sftp.fastPut(file, dest, (err, res) => {
@@ -142,7 +89,6 @@ async function deploy() {
           reject(err)
           return
         }
-
         // 到目录下删除旧的包，解压文件后，再删除掉zip包
         stream.write(`cd ${config.upload.remotePath} && rm -r -f ${config.upload.name} \nnext\n`)
         stream.write(`unzip ${config.upload.name}.zip \nnext\n`)
@@ -186,4 +132,3 @@ async function deploy() {
 }
 
 
-deploy()
