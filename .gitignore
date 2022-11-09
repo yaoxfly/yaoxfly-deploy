@@ -2,6 +2,7 @@
 node_modules
 package-lock.json
 yx.deploy.config
+pnpm-lock.yaml
 
 # local env files
 .env.local
