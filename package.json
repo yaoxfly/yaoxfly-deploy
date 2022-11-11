@@ -24,10 +24,16 @@
     "上传文件夹",
     "上传文件",
     "上传",
+    "服务器",
+    "ftp",
     "自动化部署",
+    "自动化打包",
     "auto-deploy",
     "upload file",
-    "upload dir"
+    "upload dir",
+    "压缩文件",
+    "压缩文件夹",
+    "compress"
   ],
   "repository": {
     "type": "git",
