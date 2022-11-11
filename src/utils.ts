@@ -2,6 +2,8 @@ import { PathOrFileDescriptor, readFileSync } from 'fs'
 import ora from 'ora'
 import { exec, execSync} from 'child_process'
 import path from 'path'
+import chalk from 'chalk' //这个chalk包不能下最新的会报错
+import symbols from 'log-symbols';
 /**@description 读取文件,并解析JSON。
  * @author yx
  * @param  {String}  filePath 文件路径
@@ -16,6 +18,7 @@ type Config = {
   cwd?: string
   loading?: string
   log?: string
+  succeed?:string
 }
 
 /**@description 执行shell指令，添加了提示，并返回promise。
@@ -27,22 +30,25 @@ type Config = {
           cwd: 'test',
           loading: 'loading...',
           log: `npm i`
+          succeed:'succeed'
    })
  */
 export const shellExec = (config: Config) => {
-  const { directive, cwd, loading, log } = config || {}
+  const { directive, cwd, loading, log,succeed } = config || {}
   return new Promise((resolve, reject) => {
     log && console.log(`\n ${log} \n`)
     const spinner = ora(loading);
     loading && spinner.start();
-    exec(directive, { cwd }, (error, stdout) => {
+    // 标准输出或标准错误允许的最大数据量（单位字节）。 超出则子进程将终止并截断任何输出。
+    exec(directive, { cwd,  maxBuffer: 999999999 }, (error, stdout) => {
       if (error) {
         loading && spinner.fail();
         reject(error)
         return;
       }
       resolve(stdout)
-      loading && spinner.succeed();
+      loading && spinner.stop();
+      succeed && console.log(`\n ${symbols.success} ${chalk.green(succeed)} \n`)
     });
   })
 }
@@ -74,3 +80,30 @@ export const hasPackage= ()=>{
   }
   return fn
 }
+
+
+/**@description 提示
+ * @author yx
+ * @example 
+ * const successLog=log()
+   const errorLog=log('error')
+   successLog('******* SUCCESS!! *******')
+   errorLog('******* error!! *******')
+ */
+export const log = (type = 'success') => {
+  type Log = {
+    icon?: boolean
+  }
+  const fn=(text='',config:Log={})=>{
+    const {icon=true }=config ||{}
+    const keyMap = {
+      'success': `${icon ?symbols.success+' ':''}${chalk.green(text)}`,
+      'error':   `${icon ?symbols.error+' ':''}${chalk.red(text)}`,  
+    }
+    console.log('\n', keyMap[type])
+  }
+  return fn 
+}
+
+export const successLog = log()
+export const errorLog = log('error')
