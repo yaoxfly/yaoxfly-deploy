@@ -4,6 +4,7 @@ package-lock.json
 yx.deploy.config
 pnpm-lock.yaml
 /bin
+/backup
 
 # local env files
 .env.local
