@@ -1,6 +1,6 @@
 {
   "name": "@yaoxfly/deploy",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "自动化部署",
   "main": "bin",
   "private": false,
@@ -21,10 +21,13 @@
     "access": "public"
   },
   "keywords": [
+    "上传文件夹",
+    "上传文件",
+    "上传",
     "自动化部署",
     "auto-deploy",
     "upload file",
-    "上传"
+    "upload dir"
   ],
   "repository": {
     "type": "git",
@@ -38,6 +41,8 @@
     "child_process": "1.0.2",
     "commander": "9.2.0",
     "compressing": "1.5.1",
+    "dayjs": "^1.11.6",
+    "inquirer": "8.0.0",
     "log-symbols": "4.0.0",
     "ora": "5.1.0",
     "ssh2": "1.9.0",
