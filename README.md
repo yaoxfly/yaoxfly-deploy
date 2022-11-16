@@ -68,4 +68,13 @@ module.exports = {
  yx-deploy r //缩写
 ```
 
+快速还原到最新版本
+
+```js
+ yx-deploy revert --latest 
+ or
+ yx-deploy r -l //缩写
+```
+
+
 > 当前功能需在`yx.deploy.config`配置文件中，配置`backup.open`为`true`，并且需要配置`backup.outputDir`。
