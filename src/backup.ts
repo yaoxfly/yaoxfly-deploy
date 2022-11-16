@@ -1,9 +1,10 @@
 import fs from 'fs'
 import inquirer from 'inquirer'
-import { resolve } from './utils'
+import { resolve,successLog} from './utils'
 import { config } from './config'
 import { connect } from './connect'
-export const backup = async () => {
+export const backup = async (option) => {
+  const {latest }=option ||{}
   const { backup } = config || {}
   let dir=''
   try {
@@ -20,6 +21,13 @@ export const backup = async () => {
   } catch (err) {
     throw new Error('The backup folder does not exist!')
   }
+  
+  if(latest){
+    successLog(`还原 ${file[0]} 版本`,{ icon: false }) 
+    await connect(file[0])
+    return
+  }
+
   file[0]=`${file[0]} latest`
   const param = [
     {

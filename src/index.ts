@@ -18,8 +18,9 @@ program
 program
   .command('revert').alias('r')
   .description('Revert project')
-  .action(() => {
-    backup()
+  .option('-l --latest', 'Revert latest version')
+  .action((options:any) => {
+    backup(options)
   })
 
 program.parse(process.argv)
