@@ -1,10 +1,10 @@
 import { Client } from 'ssh2'
-import { config,compressName as compress } from './config'
-import { resolve,successLog,errorLog } from './utils'
+import { config, compressName as compress } from './config'
+import { resolve, successLog, errorLog } from './utils'
 import ora from 'ora' //这个ora包不能下最新的会报错
 import fs from 'fs'
-export const connect= async (compressName=compress)=>{
-  const { backup,upload,connect:connects } = config || {}
+export const connect = async (compressName = compress) => {
+  const { backup, upload, connect: connects } = config || {}
   const connect = new Client()
   const spinnerHost = ora('正在连接服务器...')
   const connectHost = () => {
@@ -16,7 +16,7 @@ export const connect= async (compressName=compress)=>{
       password: connects.password // 用户登录密码
     })
   }
-  
+
   await connectHost()
   connect.on('ready', async () => {
     spinnerHost.stop()
@@ -44,16 +44,18 @@ export const connect= async (compressName=compress)=>{
         })
       })
     })
-  
+
+
     await new Promise((resolve, reject) => {
       connect.shell(async (err, stream) => {
         if (err) {
           reject(err)
           return
         }
+        const unzipSpinner = ora('正在解压').start();
         // 到目录下删除旧的包，解压文件后，再删除掉zip包
-        stream.write(`cd ${upload.remotePath} && rm -r -f ${upload.name} \nnext\n`)
-        stream.write(`unzip ${compressName} \nnext\n`)
+        stream.write(`cd ${upload.remotePath} && rm -r -f ${upload.name} \n`)
+        stream.write(`unzip ${compressName} \n`)
         stream.write(`rm -r -f ${compressName} \nexit\n`)
         stream.on('close', (err) => {
           connect.end()
@@ -61,7 +63,6 @@ export const connect= async (compressName=compress)=>{
             errorLog(err)
             return
           }
-          successLog('******* SUCCESS!! *******', { icon: false })
           //上传成功后再删除本地文件
           !backup?.open && fs.unlink(`${compressName}`, function (err) {
             if (err) {
@@ -69,27 +70,43 @@ export const connect= async (compressName=compress)=>{
             }
           })
         })
+
         let buf = ''
         stream.on('data', data => {
+          const res=data.toString()
           buf += data
+          if(res.includes('unzip: command not found') ){
+            unzipSpinner.stop()
+            throw new Error('unzip  is not installed on the remote server' )
+          }
+        })
+
+        stream.on('end', () => {
+          // console.log(buf,1)
+          unzipSpinner.stop()
+          if(!buf.includes('command not found') ){
+            successLog('******* SUCCESS!! *******', { icon: false })
+          }else{
+            // errorLog(buf)
+          }
         })
       })
     })
   })
-  
-  connect.on('error',async (err) => {
-   await spinnerHost.stop()
-   await errorLog('*******连接出错*******',{ icon: false })
+
+  connect.on('error', async (err) => {
+    await spinnerHost.stop()
+    await errorLog(err, { icon: false })
   })
-  
+
   connect.on('end', () => {
     successLog('*******连接关闭*******', { icon: false })
   })
-  
-  connect.on('close',async (err) => {
-    if (err){
-     await spinnerHost.stop()
-     await errorLog('*******连接出错*******',{ icon: false })
-    } 
+
+  connect.on('close', async (err) => {
+    if (err) {
+      await spinnerHost.stop()
+      await errorLog(err, { icon: false })
+    }
   })
 }
