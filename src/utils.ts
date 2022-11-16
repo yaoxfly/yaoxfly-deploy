@@ -36,7 +36,7 @@ type Config = {
 export const shellExec = (config: Config) => {
   const { directive, cwd, loading, log,succeed } = config || {}
   return new Promise((resolve, reject) => {
-    log && console.log(`\n ${log} \n`)
+    log && console.log(`\n ${log}`)
     const spinner = ora(loading);
     loading && spinner.start();
     // 标准输出或标准错误允许的最大数据量（单位字节）。 超出则子进程将终止并截断任何输出。
@@ -48,7 +48,7 @@ export const shellExec = (config: Config) => {
       }
       resolve(stdout)
       loading && spinner.stop();
-      succeed && console.log(`\n ${symbols.success} ${chalk.green(succeed)} \n`)
+      succeed && console.log(`\n ${symbols.success} ${chalk.green(succeed)}`)
     });
   })
 }
