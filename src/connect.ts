@@ -1,9 +1,9 @@
 import { Client } from 'ssh2'
-import { config, compressName as compress } from './config'
 import { resolve, successLog, errorLog } from './utils'
 import ora from 'ora' //这个ora包不能下最新的会报错
 import fs from 'fs'
-export const connect = async (compressName = compress) => {
+import {Config} from './config' 
+export const connect = async (config:Config,compressName:string) => {
   const { backup, upload, connect: connects } = config || {}
   const connect = new Client()
   const spinnerHost = ora('正在连接服务器...')

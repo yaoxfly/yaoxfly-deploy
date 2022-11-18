@@ -3,8 +3,8 @@ import compressing from 'compressing'
 import ora from 'ora' //这个ora包不能下最新的会报错
 import { connect } from './connect'
 import { shellExec, resolve, successLog } from './utils'
-import { config, compressName } from './config'
-export const upload = async () => {
+export const upload = async (option,useConfig) => {
+  const {config,compressName} =await useConfig(option)
   const { upload, build, backup } = config || {}
   build?.command && await shellExec({
     directive: `${build.command}`,
@@ -56,5 +56,5 @@ export const upload = async () => {
     successLog('压缩成功')
   }
   await compressDir()
-  await connect()
+  await connect(config,compressName)
 }

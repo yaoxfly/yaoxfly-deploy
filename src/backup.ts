@@ -1,9 +1,9 @@
 import fs from 'fs'
 import inquirer from 'inquirer'
 import { resolve,successLog} from './utils'
-import { config } from './config'
 import { connect } from './connect'
-export const backup = async (option) => {
+export const backup = async (option,useConfig) => {
+  const {config} = await useConfig(option)
   const {latest }=option ||{}
   const { backup } = config || {}
   let dir=''
@@ -24,11 +24,11 @@ export const backup = async (option) => {
   
   if(latest){
     successLog(`还原 ${file[0]} 版本`,{ icon: false }) 
-    await connect(file[0])
+    await connect(config,file[0])
     return
   }
 
-  file[0]=`${file[0]} latest`
+  file[0]=`${file[0]} --latest`
   const param = [
     {
       type: 'list',
@@ -42,5 +42,5 @@ export const backup = async (option) => {
   ]
   const answers = await inquirer.prompt(param)
   const {fileName}=answers ||{}
-  await connect(fileName)
+  await connect(config,fileName)
 }

@@ -1,23 +1,26 @@
 import fs from 'fs'
 import { resolve } from './utils'
 import dayjs from 'dayjs'
+import inquirer from 'inquirer'
 export type Config = {
-  connect: {
+  env?: {
+    name?: string,
+    description?: string
+  }
+  connect?: {
     host?: string,
     port?: number | string,
     username?: string,
     password?: string
   },
-  upload: {
+  upload?: {
     name?: string
     path?: string,
     remotePath?: string
   },
-
   build?: {
     command?: string
   },
-
   backup?: {
     open?: boolean,
     outputDir?: string,
@@ -25,11 +28,54 @@ export type Config = {
   }
 }
 
-const configPath = resolve(process.cwd(), './yx.deploy.config')
-try {
-  fs.accessSync(configPath, fs.constants.F_OK);
-} catch (err) {
-  throw new Error('The yx.deploy.config file does not exist!')
+export const useConfig = async (option) => {
+  // console.log(option, '配置里获取到的option参数')
+  const { env } = option || {}
+  const configPath = resolve(process.cwd(), './yx.deploy.config')
+
+  try {
+    fs.accessSync(configPath, fs.constants.F_OK);
+  } catch (err) {
+    throw new Error('The yx.deploy.config file does not exist!')
+  }
+
+  let configContent = require(configPath)
+  let config: Config = {}
+  let compressName = ''
+
+  if (Array.isArray(configContent)) {
+    const configObj: Config = {}
+    configContent.forEach(item => {
+       const { env: { name = ''} } = item || {}
+       configObj[name] = item
+    })
+    const choices=  Object.keys(configObj).map(key=>{
+      const { env: { name = '', description = '' } } = configObj[key]|| {}
+     return  `${name} ${description ? '--' + description : ''}`
+    })
+    if (env) {
+      config = configObj[env]
+      // console.log(config)
+    } else {
+      const param = [
+        {
+          type: 'list',
+          message: '请选择要上传的服务器环境',
+          name: 'selectEnv',
+          choices: choices,
+          filter:(val)=>{
+            return val.split(' ')[0]
+          }
+        }
+      ]
+      const answers = await inquirer.prompt(param)
+      const { selectEnv } = answers || {}
+      // console.log(configObj[selectEnv])
+      config = configObj[selectEnv]
+    }
+  } else {
+    config = configContent
+  }
+  compressName = `${config.upload.name}_${dayjs().format('YYYYMMDD_HHmmss')}.zip`
+  return { config, compressName }
 }
-export const config: Config = require(configPath)
-export const compressName = `${config.upload.name}_${dayjs().format('YYYYMMDD_HHmmss')}.zip`
