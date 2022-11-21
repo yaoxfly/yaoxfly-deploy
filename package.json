@@ -1,6 +1,6 @@
 {
   "name": "@yaoxfly/deploy",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "自动化部署",
   "main": "bin",
   "private": false,
@@ -19,6 +19,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">= 12"
   },
   "keywords": [
     "上传文件夹",
@@ -45,9 +48,9 @@
     "@types/node": "17.0.25",
     "chalk": "4.1.0",
     "child_process": "1.0.2",
-    "commander": "9.2.0",
+    "commander": "8.3.0",
     "compressing": "1.5.1",
-    "dayjs": "^1.11.6",
+    "dayjs": "1.11.6",
     "inquirer": "8.0.0",
     "log-symbols": "4.0.0",
     "ora": "5.1.0",
