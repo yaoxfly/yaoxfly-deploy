@@ -1,147 +1,147 @@
+[English](README.md) | [中文](README-CN.md)
+ 
 # @yaoxfly/deploy
-自动化打包项目, 压缩目标文件夹或文件，上传到远程服务器指定目录下并自动解压，支持多环境配置，提供指定环境上传的功能，还提供了备份还原功能，可指定环境、版本还原。该插件可用于自动化部署。
+Automatically package the project, compress the target folder or file, upload it to the specified directory of the remote server and automatically decompress it, support multiple environment configurations, provide the function of uploading the specified environment, and also provide the backup and restore function, which can specify the environmen.
 
-> 环境：目标文件或文件夹上传到不同服务器或上传到相同服务器的不同路径下，可简单理解为开发、测试、正式等环境。
+>environment：The target files or folders uploaded to different servers or different paths of the same server can be simply understood as development, test, formal and other environments.
 
-
-# 安装
+# install
 ```js
 npm i  @yaoxfly/deploy -g
 
-// 执行 yx-deploy -V 看版本号，测试是否安装成功
+// Run the yx-deploy -V command to check the version number and check whether the installation is successful
+
 ```
 
-# 配置 
-在根路径添加配置文件`yx.deploy.config`
+# configure
+Add a profile at the root path `yx.deploy.config`
 
-单环境配置
+Single environment configuration
 
 ```js
 
 module.exports = {
-  //服务器连接 --必填
+  //Server connection -- Required
   connect: {
-    host: '主机ip',
-    port: 'SSH 连接端口', //一般是22,  
-    username: '用户名',
-    password: '用户登录密码'
+    host: 'Host ip',
+    port: 'SSH connection port', //It's usually 22,  
+    username: 'User name',
+    password: 'User login password'
   },
 
-  //上传 --必填
+  //Upload -- Required
   upload: {
-    name: '文件名称或者目录名称',   //例如 'dist'
-    path: '上传的文件或者目录相对yx.deploy.config配置文件的路径，如果是文件需要后缀名', //例如 './dist' 
-    remotePath: '上传到服务器的目录' //例如 '/home/'
+    name: 'File name or directory name',   //For example 'dist'
+    path: 'The uploaded file or directory is relative to the path of the yx.deploy.config configuration file. If it is a file, the suffix is required', //For example './dist' 
+    remotePath: 'Directory to upload to the server' //For example '/home/'
   },
 
-  //打包 --可选 上传前需要打包的工程可以配置,  例如前端工程 npm run build。
+  //Packaging - Optional projects that need to be packaged before uploading can be configured, such as front-end project npm run build
   build: {
-    command: "打包执行的命令 --为空不会进行打包操作",
+    command: "Pack command to execute - Empty does not pack",
   },
 
-  //备份 --可选
+  //Backup -- Optional
   backup: {
-    open: true, //开启备份功能。
-    outputDir: 'backup', //备份输出目录,如果没有创建，会自动在根目录下创建,不可创建多级目录。
-    quantity: 5 //只保留最新的5个版本，去掉当前配置或设置为false、0 则表示无限制。
+    open: true, //Enabling the Backup function
+    outputDir: 'backup', //If the backup output directory is not created, it is automatically created in the root directory. Multi-level directories cannot be created
+    quantity: 5 //Keep only the latest five versions. If the current configuration is deleted or the value is set to false or 0, it indicates no limit
   }
 }
 ```
 
 
-多环境配置
+Multi-environment configuration
 
 ```js 
 module.exports = [
   {
-    //环境配置 --必填
+    //Environment Configuration -- Required
     env: {
-      name: '环境名称', // 例如 dev
-      description: '环境描述' //例如 开发环境 --可为空
+      name: 'Environment name', // For example dev
+      description: 'Environment description' //For example Development environment -- can be empty
     },
 
-    //服务器连接 --必填
+    // Server Connection -- Required
     connect: {
-      host: '主机ip',
-      port: 'SSH 连接端口', //一般是22,  
-      username: '用户名',
-      password: '用户登录密码'
+      host: 'Host ip',
+      port: 'SSH connection port', //It's usually 22,  
+      username: 'User name',
+      password: 'User login password'
     },
 
-    //上传 --必填
+ // Upload -- Required
     upload: {
-      name: '文件名称或者目录名称',   //例如 'dist'
-      path: '上传的文件或者目录相对yx.deploy.config配置文件的路径，如果是文件需要后缀名', //例如 './dist' 
-      remotePath: '上传到服务器的目录' //例如 '/home/'
+      name: 'File name or directory name',   //For example 'dist'
+      path: 'The uploaded file or directory is relative to the path of the yx.deploy.config configuration file. If it is a file, the suffix is required', //For example './dist' 
+      remotePath: 'Directory to upload to the server' //For example '/home/'
     },
 
-    //打包 --可选 上传前需要打包的工程可以配置,  例如前端工程 npm run build。
+   // Packaging - Optional projects that need to be packaged before uploading can be configured, such as front-end project npm run build
     build: {
-      command: "打包执行的命令 --为空不会进行打包操作",
+      command: "Pack command to execute - Empty does not pack",
     },
 
-    //备份 --可选
+   // Backup -- Optional
     backup: {
-      open: true, //开启备份功能。
-      outputDir: 'backup', //备份输出目录,如果没有创建，会自动在根目录下创建,不可创建多级目录。
-      quantity: 5 //只保留最新的5个版本，去掉当前配置或设置为false、0 则表示无限制。
+      open: true, //Enabling the Backup function
+      outputDir: 'backup', //If the backup output directory is not created, it is automatically created in the root directory. Multi-level directories cannot be created
+      quantity: 5 //Keep only the latest five versions. If the current configuration is deleted or the value is set to false or 0, it indicates no limit
     }
   }
 ]
 ```
 
-# 上传
+# upload
 
- 上传文件/文件夹到服务器，多环境下会询问指定某个环境上传
+ Upload files/folders to the server. In multiple environments, you will be asked to specify an environment to upload
 
 ```js
  yx-deploy upload 
  or
- yx-deploy u //缩写
+ yx-deploy u //abbreviation
 ```
 
-多环境不询问，快捷上传到指定环境
+Multi-environment without asking, quickly upload to the specified environment
 
 ```js
- yx-deploy upload  --env  [环境名称]
+ yx-deploy upload  --env  [Environment name]
  or
- yx-deploy u -e  [环境名称] //缩写
+ yx-deploy u -e  [Environment name] //abbreviation
 ```
 
-> 服务器需要安装`unzip`,否则解压不成功。
+> The server needs to install `unzip`,otherwise, the decompression fails。
 
 
-# 备份还原
+# Backup Restore
 
-可选择最近上传的版本还原，多环境下会询问指定某个环境还原
+You can select the most recently uploaded version to restore. In multiple environments, you will be asked to specify an environment to restore
 
 ```js
  yx-deploy revert 
  or
- yx-deploy r //缩写
+ yx-deploy r //abbreviation
 ```
 
-快速还原到最新版本
+Quickly restore to the latest version
 
 ```js
  yx-deploy revert --latest 
  or
- yx-deploy r -l //缩写
+ yx-deploy r -l //abbreviation
 ```
 
 
-多环境不询问，快捷还原到某个环境
+Quickly restore to an environment without asking for multiple environments
 
 ```js
- yx-deploy revert --env [环境名称]
+ yx-deploy revert --env [Environment name]
  or
- yx-deploy r -e [环境名称] //缩写
+ yx-deploy r -e [ Environment name ]  //abbreviation
 ```
 
+> The current function needs to be in the `yx.deploy.config` configuration file with `backup.open` set to `true` and `backup.outputDir` needs to be configured.
 
-> 当前功能需在`yx.deploy.config`配置文件中，配置`backup.open`为`true`，并且需要配置`backup.outputDir`。
+# support
 
-
-# 支持
-
- 在 `LTS` 版本的 `Node.js` 上完全支持。并且至少需要`v12`。 
+ Fully supported on the `LTS` version of `Node.js`. And it needs at least `v12`.
