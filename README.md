@@ -14,7 +14,12 @@ npm i  @yaoxfly/deploy -g
 ```
 
 # configure
-Add a profile at the root path `yx.deploy.config`
+add a configuration file in the root directory, supporting the following naming conventions.
+
++ `yx.deploy.config`
++ `yx.deploy.config.ts`
++ `yx.deploy.config.js`
+
 
 Single environment configuration
 

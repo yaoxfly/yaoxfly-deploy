@@ -14,7 +14,10 @@ npm i  @yaoxfly/deploy -g
 ```
 
 # 配置 
-在根路径添加配置文件`yx.deploy.config`
+在根路径添加配置文件,支持以下命名方式
++ `yx.deploy.config`
++ `yx.deploy.config.ts`
++ `yx.deploy.config.js`
 
 单环境配置
 
