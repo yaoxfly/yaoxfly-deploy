@@ -31,12 +31,24 @@ export type Config = {
 export const useConfig = async (option) => {
   // console.log(option, '配置里获取到的option参数')
   const { env } = option || {}
-  const configPath = resolve(process.cwd(), './yx.deploy.config')
-
-  try {
-    fs.accessSync(configPath, fs.constants.F_OK);
-  } catch (err) {
-    throw new Error('The yx.deploy.config file does not exist!')
+  const configBasePath = resolve(process.cwd(), './yx.deploy.config');
+  const configPaths = [
+    configBasePath,
+    `${configBasePath}.js`,
+    `${configBasePath}.ts`
+  ];
+  let configPath = '';
+  for (const path of configPaths) {
+    try {
+      fs.accessSync(path, fs.constants.F_OK);
+      configPath = path;
+      break;
+    } catch (err) {
+    }
+  }
+  
+  if (!configPath) {
+    throw new Error('The yx.deploy.config file does not exist! Supported extensions are: none, .js, .ts');
   }
 
   let configContent = require(configPath)
@@ -46,12 +58,12 @@ export const useConfig = async (option) => {
   if (Array.isArray(configContent)) {
     const configObj: Config = {}
     configContent.forEach(item => {
-       const { env: { name = ''} } = item || {}
-       configObj[name] = item
+      const { env: { name = '' } } = item || {}
+      configObj[name] = item
     })
-    const choices=  Object.keys(configObj).map(key=>{
-      const { env: { name = '', description = '' } } = configObj[key]|| {}
-     return  `${name} ${description ? '--' + description : ''}`
+    const choices = Object.keys(configObj).map(key => {
+      const { env: { name = '', description = '' } } = configObj[key] || {}
+      return `${name} ${description ? '--' + description : ''}`
     })
     if (env) {
       config = configObj[env]
@@ -63,7 +75,7 @@ export const useConfig = async (option) => {
           message: '请选择要上传的服务器环境',
           name: 'selectEnv',
           choices: choices,
-          filter:(val)=>{
+          filter: (val) => {
             return val.split(' ')[0]
           }
         }
