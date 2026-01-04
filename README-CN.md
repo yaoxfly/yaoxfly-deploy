@@ -49,6 +49,11 @@ module.exports = {
     open: true, //开启备份功能。
     outputDir: 'backup', //备份输出目录,如果没有创建，会自动在根目录下创建,不可创建多级目录。
     quantity: 5 //只保留最新的5个版本，去掉当前配置或设置为false、0 则表示无限制。
+  },
+
+  //压缩 --可选 仅压缩功能使用
+  compress: {
+    type: 'zip' // 压缩类型：zip、tar、tgz
   }
 }
 ```
@@ -90,6 +95,11 @@ module.exports = [
       open: true, //开启备份功能。
       outputDir: 'backup', //备份输出目录,如果没有创建，会自动在根目录下创建,不可创建多级目录。
       quantity: 5 //只保留最新的5个版本，去掉当前配置或设置为false、0 则表示无限制。
+    },
+
+    //压缩 --可选 仅压缩功能使用
+    compress: {
+      type: 'zip' // 压缩类型：zip、tar、tgz
     }
   }
 ]
@@ -147,6 +157,120 @@ module.exports = [
 > 当前功能需在`yx.deploy.config`配置文件中，配置`backup.open`为`true`，并且需要配置`backup.outputDir`。
 
 
+# 压缩
+
+仅压缩文件/文件夹，不进行上传操作
+
+```js
+ yx-deploy compress 
+ or
+ yx-deploy c //缩写
+```
+
+指定源目录进行压缩
+
+```js
+ yx-deploy compress --source [源目录路径]
+ or
+ yx-deploy c -s [源目录路径] //缩写
+```
+
+指定压缩类型
+
+```js
+ yx-deploy compress --type [压缩类型]
+ or
+ yx-deploy c -t [压缩类型] //缩写
+```
+
+指定输出目录
+
+```js
+ yx-deploy compress --output [输出目录路径]
+ or
+ yx-deploy c -o [输出目录路径] //缩写
+```
+
+使用配置文件中的压缩设置
+
+```js
+ yx-deploy compress --file
+ or
+ yx-deploy c -f //缩写
+```
+
+使用示例
+
+ + 直接传参（不使用配置文件）
+
+ ```js
+  yx-deploy compress -s ./dist -t zip -o ./output
+  // 缩写形式
+  yx-deploy c -s ./dist -t zip -o ./output
+ ```
+
+ + 使用配置文件（启用配置文件读取）
+
+ ```js
+  yx-deploy compress -f
+  // 缩写形式
+  yx-deploy c -f
+ ```
+
+ + 交互式询问（不传任何参数）
+
+ ```js
+  yx-deploy compress
+  // 缩写形式
+  yx-deploy c
+ ```
+
+ > 压缩功能支持优先级：直接传参 > 配置文件（当启用时）> 询问用户
+
+
+# 查看版本和帮助
+
+查看版本号
+
+```js
+ yx-deploy -V
+ or
+ yx-deploy --version
+```
+
+查看主命令帮助
+
+```js
+ yx-deploy -h
+ or
+ yx-deploy --help
+```
+
+查看具体命令帮助
+
+```js
+ yx-deploy upload --help
+ yx-deploy revert --help
+ yx-deploy compress --help
+ or
+ yx-deploy u -h
+ yx-deploy r -h
+ yx-deploy c -h
+```
+
+查看所有命令的缩写形式帮助
+
+```js
+ yx-deploy u --help
+ yx-deploy r --help
+ yx-deploy c --help
+ or
+ yx-deploy upload -h
+ yx-deploy revert -h
+ yx-deploy compress -h
+```
+
+
 # 支持
 
- 在 `LTS` 版本的 `Node.js` 上完全支持。并且至少需要`v12`。 
+ 在 `LTS` 版本的 `Node.js` 上完全支持。并且至少需要`v12`。

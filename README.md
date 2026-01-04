@@ -51,6 +51,11 @@ module.exports = {
     open: true, //Enabling the Backup function
     outputDir: 'backup', //If the backup output directory is not created, it is automatically created in the root directory. Multi-level directories cannot be created
     quantity: 5 //Keep only the latest five versions. If the current configuration is deleted or the value is set to false or 0, it indicates no limit
+  },
+
+  //Compression -- Optional Only used for compression function
+  compress: {
+    type: 'zip' // Compression type: zip, tar, tgz
   }
 }
 ```
@@ -92,6 +97,11 @@ module.exports = [
       open: true, //Enabling the Backup function
       outputDir: 'backup', //If the backup output directory is not created, it is automatically created in the root directory. Multi-level directories cannot be created
       quantity: 5 //Keep only the latest five versions. If the current configuration is deleted or the value is set to false or 0, it indicates no limit
+    },
+
+    //Compression -- Optional Only used for compression function
+    compress: {
+      type: 'zip' // Compression type: zip, tar, tgz
     }
   }
 ]
@@ -146,6 +156,117 @@ Quickly restore to an environment without asking for multiple environments
 ```
 
 > The current function needs to be in the `yx.deploy.config` configuration file with `backup.open` set to `true` and `backup.outputDir` needs to be configured.
+
+# Compress
+
+Compress files/folders only, without uploading
+
+```js
+ yx-deploy compress 
+ or
+ yx-deploy c //abbreviation
+```
+
+Specify source directory for compression
+
+```js
+ yx-deploy compress --source [source directory path]
+ or
+ yx-deploy c -s [source directory path] //abbreviation
+```
+
+Specify compression type
+
+```js
+ yx-deploy compress --type [compression type]
+ or
+ yx-deploy c -t [compression type] //abbreviation
+```
+
+Specify output directory
+
+```js
+ yx-deploy compress --output [output directory path]
+ or
+ yx-deploy c -o [output directory path] //abbreviation
+```
+
+Use compression settings from configuration file
+
+```js
+ yx-deploy compress --file
+ or
+ yx-deploy c -f //abbreviation
+```
+
+Usage examples
+
+ + Direct parameter passing (without configuration file)
+
+ ```js
+  yx-deploy compress -s ./dist -t zip -o ./output
+  // abbreviation
+  yx-deploy c -s ./dist -t zip -o ./output
+ ```
+
+ + Using configuration file (enable configuration file reading)
+
+ ```js
+  yx-deploy compress -f
+  // abbreviation
+  yx-deploy c -f
+ ```
+
+ + Interactive inquiry (no parameters passed)
+
+ ```js
+  yx-deploy compress
+  // abbreviation
+  yx-deploy c
+ ```
+
+ > Compression function supports priority: direct parameter passing > configuration file (when enabled) > ask user
+
+
+# View version and help
+
+View version number
+
+```js
+ yx-deploy -V
+ or
+ yx-deploy --version
+```
+
+View main command help
+
+```js
+ yx-deploy -h
+ or
+ yx-deploy --help
+```
+
+View specific command help
+
+```js
+ yx-deploy upload --help
+ yx-deploy revert --help
+ yx-deploy compress --help
+ or
+ yx-deploy u -h
+```
+
+View help for all command abbreviations
+
+```js
+ yx-deploy u --help
+ yx-deploy r --help
+ yx-deploy c --help
+ or
+ yx-deploy upload -h
+ yx-deploy revert -h
+ yx-deploy compress -h
+```
 
 # support
 
