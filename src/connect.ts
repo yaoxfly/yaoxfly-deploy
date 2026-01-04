@@ -2,8 +2,8 @@ import { Client } from 'ssh2'
 import { resolve, successLog, errorLog } from './utils'
 import ora from 'ora' //这个ora包不能下最新的会报错
 import fs from 'fs'
-import {Config} from './config' 
-export const connect = async (config:Config,compressName:string) => {
+import { Config } from './config'
+export const connect = async (config: Config, compressName: string) => {
   const { backup, upload, connect: connects } = config || {}
   const connect = new Client()
   const spinnerHost = ora('正在连接服务器...')
@@ -13,7 +13,25 @@ export const connect = async (config:Config,compressName:string) => {
       host: connects.host, // 主机ip
       port: connects.port, // SSH 连接端口
       username: connects.username, // 用户名
-      password: connects.password // 用户登录密码
+      password: connects.password, // 用户登录密码
+      readyTimeout: 60000,
+      authHandlerTimeout: 60000, // 可能需要更长
+      //  debug: console.log,
+      // algorithms: {
+      //   kex: [
+      //     'ecdh-sha2-nistp256',   // 新算法优先
+      //     'ecdh-sha2-nistp384',
+      //     'ecdh-sha2-nistp521',
+      //     'diffie-hellman-group14-sha256',
+      //     'diffie-hellman-group14-sha1',
+      //     'diffie-hellman-group1-sha1'
+      //   ],
+      //   serverHostKey: [
+      //     'rsa-sha2-256',
+      //     'rsa-sha2-512',
+      //     'ssh-rsa'   // 最后兼容老服务器
+      //   ]
+      // }
     })
   }
 
@@ -53,10 +71,28 @@ export const connect = async (config:Config,compressName:string) => {
           return
         }
         const unzipSpinner = ora('正在解压').start();
-        // 到目录下删除旧的包，解压文件后，再删除掉zip包
-        stream.write(`cd ${upload.remotePath} && rm -r -f ${upload.name} \n`)
-        stream.write(`unzip ${compressName} \n`)
-        stream.write(`rm -r -f ${compressName} \nexit\n`)
+        // 给文件名加引号，防止空格或特殊字符
+        const remoteFile = `"${compressName}"`
+        
+        // 根据扩展名选择解压命令，解决Windows路径兼容性问题
+        let extractCmd = ''
+        if (compressName.endsWith('.tar.gz') || compressName.endsWith('.tgz')) {
+          // Linux 解压 .tar.gz / .tgz，同时替换 Windows 风格 \ 为 Linux /
+          extractCmd = `tar --force-local -xzf ${remoteFile} --transform 's|\\\\|/|g'`
+        } else if (compressName.endsWith('.tar')) {
+          // Linux 解压 .tar，同时替换 Windows 风格 \ 为 Linux /
+          extractCmd = `tar --force-local -xf ${remoteFile} --transform 's|\\\\|/|g'`
+        } else if (compressName.endsWith('.zip')) {
+          // unzip 自动覆盖
+          extractCmd = `unzip -o ${remoteFile}`
+        } else {
+          extractCmd = `unzip -o ${remoteFile}`
+        }
+        
+        // 到目录下删除旧的包，解压文件后，再删除掉压缩包
+        stream.write(`cd ${upload.remotePath} && rm -rf ${upload.name} \n`)
+        stream.write(`${extractCmd} \n`)
+        stream.write(`rm -f ${remoteFile} \nexit\n`)
         stream.on('close', (err) => {
           connect.end()
           if (err) {
@@ -73,20 +109,26 @@ export const connect = async (config:Config,compressName:string) => {
 
         let buf = ''
         stream.on('data', data => {
-          const res=data.toString()
+          const res = data.toString()
           buf += data
-          if(res.includes('unzip: command not found') ){
+          
+          // 检查解压命令是否可用
+          if (res.includes('unzip: command not found')) {
             unzipSpinner.stop()
-            throw new Error('unzip  is not installed on the remote server' )
+            throw new Error('unzip is not installed on the remote server')
+          }
+          if (res.includes('tar: command not found')) {
+            unzipSpinner.stop()
+            throw new Error('tar is not installed on the remote server')
           }
         })
 
         stream.on('end', () => {
           // console.log(buf,1)
           unzipSpinner.stop()
-          if(!buf.includes('command not found') ){
+          if (!buf.includes('command not found')) {
             successLog('******* SUCCESS!! *******', { icon: false })
-          }else{
+          } else {
             // errorLog(buf)
           }
         })

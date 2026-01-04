@@ -25,6 +25,9 @@ export type Config = {
     open?: boolean,
     outputDir?: string,
     quantity?: number
+  },
+  compress?: {
+    type?: 'zip' | 'tar' | 'tgz'
   }
 }
 
@@ -88,6 +91,8 @@ export const useConfig = async (option) => {
   } else {
     config = configContent
   }
-  compressName = `${config.upload.name}_${dayjs().format('YYYYMMDD_HHmmss')}.zip`
+  const compressType = config.compress?.type || 'zip'
+  const fileExt = compressType === 'tgz' ? 'tar.gz' : compressType
+  compressName = `${config.upload.name}_${dayjs().format('YYYYMMDD_HHmmss')}.${fileExt}`
   return { config, compressName }
 }

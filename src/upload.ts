@@ -49,9 +49,23 @@ export const upload = async (option,useConfig) => {
     }
 
     const dir = resolve(process.cwd(), upload.path)
-    const dest = resolve(process.cwd(), `${backup?.open ? backup.outputDir + '/' : ""}${compressName}`)
+    const compressType = config.compress?.type || 'zip'
+    const fileExt = compressType === 'tgz' ? 'tar.gz' : compressType
+    const dest = resolve(process.cwd(), `${backup?.open ? backup.outputDir + '/' : ""}${compressName.replace('.zip', `.${fileExt}`)}`)
     const spinner = ora('正在压缩').start();
-    const rs = await compressing.zip.compressDir(dir, dest)
+    
+    let rs
+    switch(compressType) {
+      case 'tar':
+        rs = await compressing.tar.compressDir(dir, dest)
+        break
+      case 'tgz':
+        rs = await compressing.tgz.compressDir(dir, dest)
+        break
+      default:
+        rs = await compressing.zip.compressDir(dir, dest)
+    }
+    
     spinner.stop();
     successLog('压缩成功')
   }
