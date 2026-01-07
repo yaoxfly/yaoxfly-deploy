@@ -73,23 +73,21 @@ export const connect = async (config: Config, compressName: string) => {
         const unzipSpinner = ora('正在解压').start();
         // 给文件名加引号，防止空格或特殊字符
         const remoteFile = `"${compressName}"`
-        
+
         // 根据扩展名选择解压命令，解决Windows路径兼容性问题
         let extractCmd = ''
         if (compressName.endsWith('.tar.gz') || compressName.endsWith('.tgz')) {
-          // Linux 解压 .tar.gz / .tgz，同时替换 Windows 风格 \ 为 Linux /
-          extractCmd = `tar --force-local -xzf ${remoteFile} --transform 's|\\\\|/|g'`
+          extractCmd = `tar  -xzf ${remoteFile}`
         } else if (compressName.endsWith('.tar')) {
-          // Linux 解压 .tar，同时替换 Windows 风格 \ 为 Linux /
-          extractCmd = `tar --force-local -xf ${remoteFile} --transform 's|\\\\|/|g'`
+          extractCmd = `tar  -xf ${remoteFile}`
         } else if (compressName.endsWith('.zip')) {
           // unzip 自动覆盖
           extractCmd = `unzip -o ${remoteFile}`
         } else {
           extractCmd = `unzip -o ${remoteFile}`
         }
-        
-        // 到目录下删除旧的包，解压文件后，再删除掉压缩包
+
+        // 到目录下先删除旧的包，解压文件后，再删除掉压缩包
         stream.write(`cd ${upload.remotePath} && rm -rf ${upload.name} \n`)
         stream.write(`${extractCmd} \n`)
         stream.write(`rm -f ${remoteFile} \nexit\n`)
@@ -111,7 +109,7 @@ export const connect = async (config: Config, compressName: string) => {
         stream.on('data', data => {
           const res = data.toString()
           buf += data
-          
+
           // 检查解压命令是否可用
           if (res.includes('unzip: command not found')) {
             unzipSpinner.stop()

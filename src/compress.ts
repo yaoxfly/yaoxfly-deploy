@@ -3,7 +3,8 @@ import compressing from 'compressing'
 import ora from 'ora'
 import inquirer from 'inquirer'
 import dayjs from 'dayjs'
-import { resolve, successLog, errorLog } from './utils'
+import path from 'path'
+import { resolve, successLog, errorLog, shellExec } from './utils'
 import { useConfig, Config } from './config'
 
 interface CompressOptions {
@@ -255,11 +256,25 @@ export const compress = async (option: CompressOptions = {}) => {
       let result
       switch(type) {
         case 'tar':
-          result = await compressing.tar.compressDir(resolvedSourcePath, destPath)
+        case 'tgz': {
+          // tar 或 tgz 使用系统命令压缩，保留外层文件夹
+          const gzipFlag = type === 'tgz' ? 'z' : '' // tgz 需要 gzip 压缩
+          // Git Bash / WSL 下路径转换：D:\... -> /d/...
+          const toGitBashPath = (p: string) => {
+            const driveLetter = p[0].toLowerCase()
+            return '/' + driveLetter + p.slice(2).replace(/\\/g, '/')
+          }
+      
+          // resolvedSourcePath 是要压缩的完整路径
+          const parentDir = path.dirname(resolvedSourcePath)       // 父目录
+          const baseName = path.basename(resolvedSourcePath)       // 文件夹名
+      
+          const posixDest = toGitBashPath(destPath)
+          const posixParent = toGitBashPath(parentDir)
+          const cmd = `tar -c${gzipFlag}f "${posixDest}" -C "${posixParent}" "${baseName}"`
+          result = await shellExec({ directive: cmd, cwd: process.cwd() })
           break
-        case 'tgz':
-          result = await compressing.tgz.compressDir(resolvedSourcePath, destPath)
-          break
+        }
         case 'zip':
         default:
           result = await compressing.zip.compressDir(resolvedSourcePath, destPath)
@@ -300,45 +315,3 @@ export const compress = async (option: CompressOptions = {}) => {
   return results
 }
 
-// 独立的压缩函数，可用于其他模块
-export const compressDirectory = async (sourceDir: string, destPath: string, compressType: 'zip' | 'tar' | 'tgz' = 'zip') => {
-  console.log(`开始压缩: ${sourceDir} -> ${destPath} (${compressType})`)
-  
-  // 检查源目录是否存在
-  if (!fs.existsSync(sourceDir)) {
-    throw new Error(`源目录不存在: ${sourceDir}`)
-  }
-  
-  // 确保目标目录存在
-  const destDir = resolve(destPath, '..')
-  if (!fs.existsSync(destDir)) {
-    fs.mkdirSync(destDir, { recursive: true })
-  }
-  
-  try {
-    let result
-    switch(compressType) {
-      case 'tar':
-        result = await compressing.tar.compressDir(sourceDir, destPath)
-        break
-      case 'tgz':
-        result = await compressing.tgz.compressDir(sourceDir, destPath)
-        break
-      case 'zip':
-      default:
-        result = await compressing.zip.compressDir(sourceDir, destPath)
-    }
-    
-    console.log(`✅ 压缩成功: ${destPath}`)
-    
-    // 显示文件大小
-    const stats = fs.statSync(destPath)
-    const fileSize = (stats.size / 1024 / 1024).toFixed(2)
-    console.log(`📊 文件大小: ${fileSize} MB`)
-    
-    return result
-  } catch (error) {
-    console.error(`❌ 压缩失败: ${error.message}`)
-    throw error
-  }
-}
